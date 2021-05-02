@@ -3,7 +3,6 @@
 # This script will install all dependencies for this dotfiles repository
 # and will automatically call by the ecos installation routine
 
-
 # ///////////////////////////////////////////
 # Helper
 # ///////////////////////////////////////////
