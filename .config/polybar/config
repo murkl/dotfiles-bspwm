@@ -1,0 +1,386 @@
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# ICON SEARCH
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+# https://www.nerdfonts.com/cheat-sheet
+# https://fontawesome.com/cheatsheet?from=io
+
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# COLORS
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+[colors]
+
+transparent = #00000000
+
+background = ${xrdb:background}
+foreground = ${xrdb:foreground}
+
+black = ${xrdb:color0}
+darkred = ${xrdb:color1}
+darkgreen = ${xrdb:color2}
+darkyellow = ${xrdb:color3}
+darkblue = ${xrdb:color4}
+darkmagenta = ${xrdb:color5}
+darkcyan = ${xrdb:color6}
+lightgray = ${xrdb:color7}
+gray = ${xrdb:color8}
+red = ${xrdb:color9}
+green = ${xrdb:color10}
+yellow = ${xrdb:color11}
+blue = ${xrdb:color12}
+magenta = ${xrdb:color13}
+cyan = ${xrdb:color14}
+white = ${xrdb:color15}
+
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# BARS
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+[bar/mainbar]
+
+locale =de_DE.UTF-8
+monitor = ${env:MONITOR:}
+width = 99.1%
+height = 28
+offset-x = 8
+offset-y = 8
+;radius = 6.0
+fixed-center = true
+;enable-ipc = true
+bottom = false
+wm-restack = bspwm
+;override-redirect = true
+;separator = "|"
+
+# Padding
+padding = 0
+padding-left = 2
+padding-right = 2
+
+# Colors
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+# Fonts
+# fc-list | grep "Fira"
+# fc-match "Fira Code:style=Bold:pixelsize=12"
+
+# ttf-fira-code
+font-0 = "Fira Code:size=10;2"
+
+# ttf-nerd-fonts-symbols
+font-1 = "Symbols Nerd Font:size=10;2"
+
+# Lines
+line-size = 4
+line-color = ${colors.blue}
+
+# Borders
+border-size = 0
+border-color = ${colors.background}
+
+# Modules
+modules-left = arch bspwm
+modules-center = time
+modules-right =  mpd weather email-posteo updates network-wireless network-wired battery pulseaudio power
+
+module-margin-left = 2
+module-margin-right = 2
+
+# System Tray
+#tray-position = right
+tray-position = disabled
+tray-padding = 4
+tray-maxsize = 12
+;tray-background = ${colors.background}
+;tray-offset-x = 335
+tray-offset-y = 0
+tray-detached = false
+
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# SETTINGS
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+[settings]
+screenchange-reload = true
+pseudo-transparency = true
+throttle-output = 5
+throttle-output-for = 10
+throttle-input-for = 30
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# MODULES
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+[module/bspwm]
+type = internal/bspwm
+
+label-focused       = ""
+label-focused-empty = ""
+label-occupied      = ""
+label-urgent        = ""
+label-empty         = ""
+
+label-focused-foreground = ${colors.green}
+label-focused-empty-foreground = ${colors.green}
+label-focused-background = ${colors.black}
+label-focused-empty-background = ${colors.black}
+label-urgent-foreground = ${colors.red}
+label-occupied-foreground = ${colors.blue}
+label-empty-foreground = ${colors.black}
+
+label-focused-empty-padding = 2
+label-focused-padding = 2
+label-occupied-padding = 2
+label-urgent-padding = 2
+label-empty-padding = 2
+
+#---------------------------------------------------
+
+[module/arch]
+type = custom/script
+exec = "echo ' '"
+label-foreground = ${colors.green}
+click-left = launcher
+#click-right = notify-send "Select Window to close" & sh -c xkill
+click-right = launcher --window
+
+#---------------------------------------------------
+
+[module/power]
+type = custom/script
+exec = "echo ' '"
+label-foreground = ${colors.green}
+click-left = launcher --system
+click-right = launcher --power
+
+#---------------------------------------------------
+
+[module/time]
+type = internal/date
+
+date = "%H:%M"
+date-alt = "%a %d %b"
+
+format = "<label>"
+label = "%date%"
+
+#format-prefix = "  "
+format-foreground = ${colors.blue}
+label-foreground = ${colors.foreground}
+
+#---------------------------------------------------
+
+[module/pulseaudio]
+type = internal/pulseaudio
+use-ui-max = false
+interval = 5
+format-volume = <label-volume>
+format-volume-prefix = "墳 "
+format-muted-prefix = "婢 "
+
+format-volume-foreground = ${colors.blue}
+format-muted-foreground = ${colors.red}
+
+label-volume-foreground = ${colors.foreground}
+label-muted-foreground = ${colors.red}
+
+#---------------------------------------------------
+
+[module/pulseaudio-bar]
+type = internal/pulseaudio
+
+format-volume = <label-volume> <bar-volume>
+label-volume = "蓼 "
+label-volume-foreground = ${colors.blue}
+
+format-muted-prefix = "蓼 "
+format-muted-foreground = ${colors.foreground}
+format-muted-prefix-foreground = ${colors.darkred}
+label-muted = "                "
+bar-volume-width = 10
+bar-volume-foreground-0 = ${colors.blue}
+bar-volume-gradient = true
+bar-volume-indicator = -
+bar-volume-indicator-foreground = ${colors.blue}
+
+bar-volume-0 = 奄
+bar-volume-1 = 奔
+bar-volume-2 = 墳
+
+bar-volume-fill = -
+bar-volume-empty = -
+bar-volume-empty-foreground = ${colors.black}
+
+#---------------------------------------------------
+
+[module/mpd]
+type = internal/mpd
+
+format-online = "<label-song>"
+label-offline = ""
+#label-song = %title%
+label-song = "MPD"
+format-online-prefix = "ﱘ "
+label-song-maxlen = 24
+format-online-foreground = ${colors.blue}
+label-song-foreground = ${colors.gray}
+
+#---------------------------------------------------
+
+[module/network-wireless]
+type = internal/network
+#interface = wlp8s0
+interface = ${env:ECOS_WIRELESS_INTERFACE:}
+
+interval = 3.0
+
+udspeed-minwidth = 5
+
+accumulate-stats = true
+
+unknown-as-up = true
+
+format-connected = <label-connected> <ramp-signal>
+
+format-disconnected = <label-disconnected>
+format-packetloss = <animation-packetloss> <label-connected>
+label-connected = "直"
+label-connected-foreground = ${colors.blue}
+
+label-disconnected-foreground = #ef7458
+
+ramp-signal-0 = 10%
+ramp-signal-1 = 20%
+ramp-signal-2 = 50%
+ramp-signal-3 = 70%
+ramp-signal-4 = 90%
+ramp-signal-5 = 100%
+
+
+animation-packetloss-0 = ⚠
+animation-packetloss-0-foreground = #ffa64c
+animation-packetloss-1 = 📶
+animation-packetloss-1-foreground = #000000
+animation-packetloss-framerate = 500
+
+#---------------------------------------------------
+
+[module/network-wired]
+type = internal/network
+interface = enp2s0
+interval = 3.0
+unknown-as-up = true
+accumulate-stats = true
+
+format-connected = <label-connected>
+label-connected = ""
+format-connected-foreground = ${colors.blue}
+label-connected-foreground = ${colors.foreground}
+
+format-packetloss = <animation-packetloss> <label-connected>
+
+format-disconnected = <label-disconnected>
+label-disconnected = ""
+format-disconnected-foreground = ${colors.blue}
+label-disconnected-foreground = #ef7458
+
+#---------------------------------------------------
+
+[module/updates]
+type = custom/script
+exec = ~/.local/bin/status/updates
+interval = 18000
+
+label = %output%
+format-prefix = "ﰬ "
+
+format-foreground = ${colors.blue}
+label-foreground = ${colors.foreground}
+
+#---------------------------------------------------
+
+[module/email-posteo]
+type = custom/script
+exec = ~/.local/bin/status/email-posteo
+interval = 60
+
+label = %output%
+format-prefix = " "
+
+format-foreground = ${colors.blue}
+label-foreground = ${colors.foreground}
+
+#---------------------------------------------------
+
+[module/weather]
+type = custom/script
+exec = ~/.local/bin/status/weather
+exec-if = ping openweathermap.org -c 1
+interval = 600
+label = %output%
+
+format-prefix = "﨎 "
+
+format-foreground = ${colors.blue}
+label-foreground = ${colors.foreground}
+
+#---------------------------------------------------
+
+[module/battery]
+type = internal/battery
+
+full-at = 99
+
+# ls -1 /sys/class/power_supply/
+
+battery = ${env:ECOS_BATTERY_INTERFACE:}
+adapter = ${env:ECOS_BATTERY_ADAPTER:}
+
+format-charging-foreground = ${colors.blue}
+label-charging-foreground = ${colors.foreground}
+
+format-discharging-foreground = ${colors.blue}
+label-discharging-foreground = ${colors.foreground}
+
+format-full-foreground = ${colors.blue}
+label-full-foreground = ${colors.foreground}
+poll-interval = 5
+
+time-format = %H:%M
+format-charging = <animation-charging> <label-charging>
+
+format-discharging = <ramp-capacity> <label-discharging>
+format-full = <ramp-capacity> <label-full>
+
+label-charging = %percentage%%
+label-discharging = %percentage%%
+
+label-full = %percentage%%
+
+ramp-capacity-0 = 
+ramp-capacity-1 = 
+ramp-capacity-2 = 
+ramp-capacity-3 = 
+ramp-capacity-4 = 
+
+bar-capacity-width = 10
+
+animation-charging-0 = 
+animation-charging-1 = 
+animation-charging-2 = 
+animation-charging-3 = 
+animation-charging-4 = 
+animation-charging-framerate = 750
+
+animation-discharging-0 = 
+animation-discharging-1 = 
+animation-discharging-2 = 
+animation-discharging-3 = 
+animation-discharging-4 = 
+animation-discharging-framerate = 500

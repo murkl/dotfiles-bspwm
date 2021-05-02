@@ -1,0 +1,216 @@
+#!/bin/sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+MENUS="$SCRIPT_DIR/menus"
+DASHBOARDS_FILE="$ECOS_CONFIG_HOME/dashboards.sh"
+FAVORITS_FILE="$ECOS_CONFIG_HOME/favorits.sh"
+
+#/////////////////////////////////////////////
+# DEPENDENCIES
+#/////////////////////////////////////////////
+
+if ! [ -x "$(command -v rofi)" ]; then
+    notify-send "ERROR: rofi not installed"
+    exit 1
+fi
+
+if ! [ -x "$(command -v zenity)" ]; then
+    notify-send "ERROR: zenity not installed"
+    exit 1
+fi
+
+if ! [ -f "$ECOS_CORE" ]; then
+    notify-send "WARN: ECOS Core not found"
+fi
+
+#/////////////////////////////////////////////
+# FUNCTIONS
+#/////////////////////////////////////////////
+
+main() {
+
+    # Help
+    if [ "$1" = "--help" ]; then
+        show_help
+        exit 0
+    fi
+
+    # Create Defaults
+    create_default_favorits
+    create_default_dashboards
+
+    # Window Menu
+    if [ "$1" = "--window" ]; then
+        show_window_control
+        exit 0
+    fi
+
+    # System Menu
+    if [ "$1" = "--system" ]; then
+        sh -c "$MENUS/system-menu"
+        exit 0
+    fi
+
+    # Power Menu
+    if [ "$1" = "--power" ]; then
+        sh -c "$MENUS/system-menu --power"
+        exit 0
+    fi
+
+    # Screenshot
+    if [ "$1" = "--screenshot" ]; then
+        sh -c "$MENUS/screenshot-tool"
+        exit 0
+    fi
+
+    # Default mode
+    if [ "$1" = "" ]; then
+        show_default_mode
+        exit 0
+    fi
+
+}
+
+#/////////////////////////////////////////////
+
+create_default_favorits() {
+    if [ ! -f "$FAVORITS_FILE" ]; then
+        {
+            echo -e '#!/bin/bash'
+            echo -e 'dmenu_result="$(printf "Push Dotfiles" | dmenu -i -p "留 ")" || exit 1'
+            echo -e 'if [[ "$dmenu_result" == *"Push Dotfiles"* ]]; then'
+            echo -e '   $TERMINAL -e sh -c '"'"'dots status && echo -e "\\n\\nCANCEL:\\t\\tPress c\\n\\nCONTINUE:\tPress <Ctrl >+ <ENTER >\\n" && read && dots commit -am "update"; dots push'"'"''
+            echo -e 'fi'
+        } >"$FAVORITS_FILE"
+    fi
+    chmod +x "$FAVORITS_FILE"
+}
+
+#/////////////////////////////////////////////
+
+create_default_dashboards() {
+    if [ ! -f "$DASHBOARDS_FILE" ]; then
+        {
+            echo -e '#!/bin/bash'
+            echo -e 'dmenu_result="$(printf "Desktop\\nTV" | dmenu -i -p " ")" || exit 1'
+            echo -e 'if [[ "$dmenu_result" == *"Desktop"* ]]; then'
+            echo -e '   set-dpi 1.0'
+            echo -e '   set-wallpaper'
+            echo -e '   exit'
+            echo -e 'fi'
+            echo -e 'if [[ "$dmenu_result" == *"TV"* ]]; then'
+            echo -e '   set-dpi 0.6'
+            echo -e '   set-wallpaper'
+            echo -e '   exit'
+            echo -e 'fi'
+        } >"$DASHBOARDS_FILE"
+    fi
+    chmod +x "$DASHBOARDS_FILE"
+}
+
+show_default_mode() {
+    dmenu_entries="留  Favorits\n  Dashboard\n  Tools\n  Applications\n  Terminal\n爵  Browser\n  Files\n  Editor\n  Mail\n  Music"
+    dmenu_result="$(printf "$dmenu_entries" | dmenu -i -p ": ")" || exit 1
+
+    if [[ "$dmenu_result" == *"Dashboard" ]]; then
+        "$DASHBOARDS_FILE"
+    fi
+
+    if [[ "$dmenu_result" == *"Favorits" ]]; then
+        "$FAVORITS_FILE"
+    fi
+
+    if [[ "$dmenu_result" == *"Tools" ]]; then
+        show_tools
+    fi
+
+    if [[ "$dmenu_result" == *"Applications" ]]; then
+        show_apps
+    fi
+
+    if [[ "$dmenu_result" == *"Terminal" ]]; then
+        $ECOS_TERMINAL
+    fi
+
+    if [[ "$dmenu_result" == *"Files" ]]; then
+        toggle --app $ECOS_FILES $ECOS_FILES_CLASS
+    fi
+
+    if [[ "$dmenu_result" == *"Browser" ]]; then
+        toggle --app $ECOS_BROWSER $ECOS_BROWSER_CLASS
+    fi
+
+    if [[ "$dmenu_result" == *"Mail" ]]; then
+        toggle --app $ECOS_EMAIL $ECOS_EMAIL_CLASS
+    fi
+
+    if [[ "$dmenu_result" == *"Music" ]]; then
+        $ECOS_MUSIC
+    fi
+
+    if [[ "$dmenu_result" == *"Editor" ]]; then
+        toggle --app $ECOS_EDITOR $ECOS_EDITOR_CLASS
+    fi
+}
+
+#/////////////////////////////////////////////
+
+show_window_control() {
+    dmenu_result="$(printf "窱  Close Window\n視  Switch Window\n  Move to Left Workspace\n  Move to Right Workspace" | dmenu -i -p ": ")" || exit 1
+
+    if [[ "$dmenu_result" == *"Close Window"* ]]; then
+        bspc node -c
+    fi
+
+    if [[ "$dmenu_result" == *"Switch Window"* ]]; then
+        bspc node -f prev.local.!hidden.window
+    fi
+
+    if [[ "$dmenu_result" == *"Left Workspace"* ]]; then
+        bspc node -d 'prev.local' --follow
+    fi
+
+    if [[ "$dmenu_result" == *"Right Workspace"* ]]; then
+        bspc node -d 'next.local' --follow
+    fi
+}
+
+#/////////////////////////////////////////////
+
+show_tools() {
+    dmenu_entries="  Media Downloader\n  Mount Manager\n  Backup Manager\n  Password Manager\n  Screenshot Tool"
+    dmenu_result="$(printf "$dmenu_entries" | dmenu -i -p " ")" || exit 1
+
+    if [[ "$dmenu_result" == *"Screenshot Tool" ]]; then
+        sh -c "$MENUS/screenshot-tool"
+    fi
+
+    if [[ "$dmenu_result" == *"Password Manager" ]]; then
+        sh -c "$MENUS/pass-manager"
+    fi
+
+    if [[ "$dmenu_result" == *"Mount Manager" ]]; then
+        sh -c "$MENUS/mount-manager"
+    fi
+
+    if [[ "$dmenu_result" == *"Backup Manager" ]]; then
+        sh -c "$MENUS/backup-manager"
+    fi
+
+    if [[ "$dmenu_result" == *"Media Downloader" ]]; then
+        sh -c "$MENUS/media-downloader"
+    fi
+}
+
+#/////////////////////////////////////////////
+
+show_apps() {
+    rofi -show drun
+}
+
+#/////////////////////////////////////////////
+# BOOT
+#/////////////////////////////////////////////
+
+main "$@"
+
+#/////////////////////////////////////////////

@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# VARS
+#######################################
+STATE_FILE="/tmp/toggle-desktop-state-is-hidden.tmp"
+
+# DEPENDENCIES
+#######################################
+if ! [ -x "$(command -v wmctrl)" ]; then
+	notify-send "ERROR: wmctrl not installed"
+	exit 1
+fi
+
+# FUNCTIONS
+#######################################
+
+main() {
+
+	if [ "$1" = "" ]; then
+		echo "TOGGLE DESKTOP"
+		echo -e "\ttoggle --desktop"
+		echo -e ""
+		echo "TOGGLE APP"
+		echo -e "\ttoggle --app <APP> <WM_CLASS>"
+		echo -e ""
+		echo "TOGGLE REDSHIFT"
+		echo -e "\ttoggle --redshift"
+		echo -e ""
+		echo "SHOW WM_CLASS"
+		echo -e "\ttoggle --show-class"
+		exit 0
+	fi
+
+	if [ "$1" = "--desktop" ]; then
+		toggle_desktop
+		exit 0
+	fi
+
+	if [ "$1" = "--app" ]; then
+		toggle_app "$2" "$3"
+		exit 0
+	fi
+
+	if [ "$1" = "--redshift" ]; then
+		toggle_redshift
+		exit 0
+	fi
+
+	if [ "$1" = "--show-class" ]; then
+		xprop | grep WM_CLASS
+		exit 0
+	fi
+}
+
+toggle_desktop() {
+	if [ -f "$STATE_FILE" ]; then
+		rm "$STATE_FILE"
+		wmctrl -k off
+	else
+		wmctrl -k on
+		touch "$STATE_FILE"
+	fi
+}
+
+toggle_app() {
+	if [ "$(wmctrl -x -l | grep -i "$2")" = "" ]; then
+		"$1" &
+	else
+		wmctrl -x -a "$2"
+	fi
+}
+
+toggle_redshift() {
+	redshift_status=''
+
+	# check if process is running ( 0 = off, 1 = on )
+	ps -C redshift >/dev/null && redshift_status=1 || redshift_status=0
+	echo $redshift_status
+
+	if [ "$redshift_status" = 0 ]; then
+		# if off then turn on
+		redshift >/dev/null 2>&1 &
+		#disown
+		notify-send "Redshift on"
+	else
+		# if on then turn off
+		redshift -x
+		killall redshift
+		notify-send "Redshift off"
+	fi
+}
+
+# BOOT
+#######################################
+main "$@"
+#######################################

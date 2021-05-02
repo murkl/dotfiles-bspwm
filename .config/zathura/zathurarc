@@ -1,0 +1,5 @@
+# Hide status bar
+set guioptions none
+
+# Copy to clipboard instead of primary selection
+set selection-clipboard clipboard

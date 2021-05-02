@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Set Wallpaper
+Icon=preferences-desktop-wallpaper
+Exec=set-wallpaper %f
+Type=Application
+MimeType=image/jpeg;image/jpg;image/png;
+NoDisplay=true

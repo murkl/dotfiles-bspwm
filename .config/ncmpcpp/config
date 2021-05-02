@@ -1,0 +1,34 @@
+mpd_host = "localhost"
+mpd_port = "6600"
+mpd_music_dir = ~/Music
+
+ncmpcpp_directory = ~/.config/ncmpcpp
+lyrics_directory = ~/.config/ncmpcpp/lyrics
+visualizer_type = "spectrum"
+visualizer_look = "∙│"
+visualizer_color = yellow
+
+song_list_format = "{{%a  %t}|{%f}}{$R%l}"
+current_item_prefix = $(yellow)$r
+
+current_item_inactive_column_prefix = $(white)$r
+now_playing_prefix = "$4"
+now_playing_suffix = "$9"
+#execute_on_song_change = notify-send "Music" "$(mpc current)"
+
+playlist_display_mode = "classic"
+user_interface = classic
+header_visibility = "no"
+statusbar_visibility = "no"
+titles_visibility = "no"
+
+#follow_now_playing_lyrics = yes
+#fetch_lyrics_for_current_song_in_background = yes
+main_window_color = white
+
+progressbar_look = "─╼ "
+progressbar_elapsed_color = "cyan"
+
+#song_list_format = "{%a - }{%t}|{$8%f$9}%r{$3(%l)$9}"
+#song_status_format = "{(%l) }{%a - }{%t}|{%f}"
+#fancy_scrolling = "yes"

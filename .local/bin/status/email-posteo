@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#/////////////////////////////////////////////
+PASSWORD=$($ECOS_POSTEO_PASSWORD)
+POSTEO_INBOX_RESULT="$(echo "user = \"$ECOS_POSTEO_EMAIL:$PASSWORD\"" | curl -sf -K- -X "STATUS INBOX (UNSEEN)" imaps://"$ECOS_POSTEO_SERVER"/INBOX | tr -d -c "[:digit:]")"
+if [[ "$POSTEO_INBOX_RESULT" == *"Error"* ]]; then
+    echo "-1"
+    exit
+fi
+
+#/////////////////////////////////////////////
+
+if [ "$POSTEO_INBOX_RESULT" ] && [ "$POSTEO_INBOX_RESULT" -gt 0 ]; then
+    echo "$POSTEO_INBOX_RESULT"
+else
+    echo "0"
+fi

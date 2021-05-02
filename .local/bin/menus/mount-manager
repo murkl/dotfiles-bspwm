@@ -1,0 +1,114 @@
+#!/bin/bash
+ICON=" "
+
+SUDO_PASSWORD=""
+
+set_sudo_password() {
+    SUDO_PASSWORD="$(dmenu -i -password -p "$ICON Root Password:")" || exit 1
+    if [ "$SUDO_PASSWORD" == "" ]; then
+        notify-send "Sudo Password was empty"
+        exit 1
+    fi
+}
+
+unmount_nfs() {
+    set_sudo_password
+    sh -c "echo $SUDO_PASSWORD | sudo -S umount -R /mnt/nfs"
+    notify-send "NFS: Unmount finished"
+}
+
+unmount_usb_crypt() {
+    set_sudo_password
+    sh -c "echo $SUDO_PASSWORD | sudo -S umount -R /mnt/crypt-usb"
+    sh -c "echo $SUDO_PASSWORD | sudo -S cryptsetup close cryptmount"
+    notify-send "USB-Crypt: Unmount finished"
+}
+
+mount_nfs() {
+
+    nfs_host="$(printf "zeus" | dmenu -i -p "$ICON NFS Host:")" || exit 1
+    nfs_dir="$(printf "/mnt/dietpi_userdata" | dmenu -i -p "$ICON NFS Remote Dir:")" || exit 1
+
+    set_sudo_password
+    sh -c "echo $SUDO_PASSWORD | sudo -S mkdir -p /mnt/nfs"
+    sh -c "echo $SUDO_PASSWORD | sudo -S mount -t nfs $nfs_host:$nfs_dir /mnt/nfs"
+    notify-send "NFS: $nfs_host mounted"
+}
+
+mount_usb_crypt() {
+
+    # Read disks
+    disk_array=("")
+    while read disk_line; do
+        disk_size=$(lsblk -d -n -o SIZE /dev/$disk_line)
+        disk_array+=("/dev/$disk_line ($disk_size)\n")
+    done < <(lsblk -I 8 -d -o KNAME -n)
+
+    # Show disks
+    disk_user="$(printf "${disk_array[*]}" | dmenu -i -p "$ICON Select Encrypted Disk:")" || exit 1
+
+    # Remove size from string
+    disk="$(echo $disk_user | cut -f 1 -d ' ')"
+    disk_crypt="$disk"'1'
+    echo "Selected Crypt-Disk: $disk_crypt"
+
+    # Ask sudo password
+    set_sudo_password
+
+    # Ask encryption password
+    password_encryption="$(dmenu -i -password -p "$ICON Encryption Password:")" || exit 1
+    if [ "$password_encryption" == "" ]; then
+        notify-send "Encryption Password was empty"
+        exit 1
+    fi
+
+    # Make mount dir
+    if ! echo "$SUDO_PASSWORD" | sudo -S mkdir -p /mnt/crypt-usb; then
+        notify-send "Make mnt dir error"
+        exit 1
+    fi
+
+    # Open encryption
+    if ! echo -n "$password_encryption" | sudo cryptsetup luksOpen $disk_crypt cryptmount -d - >/dev/null; then
+        notify-send "CryptSetup error"
+        exit 1
+    fi
+
+    # Mount encryption
+    if ! echo $SUDO_PASSWORD | sudo -S mount /dev/mapper/cryptmount /mnt/crypt-usb; then
+        notify-send "Mount encryption error"
+        exit 1
+    fi
+
+    notify-send "$disk_crypt mounted"
+}
+
+mount_image() {
+    FILE=$(basename "$1")
+    MOUNTPOINT="$HOME/Desktop/$FILE"
+    fuseiso -p "$1" "$MOUNTPOINT"
+}
+
+mount_samba() {
+    SMB_HOST=zeus
+    SMB_USER=dietpi
+    SMB_WORKGROUP=workgroup
+    SMB_SHARE=data
+
+    # List Shares
+    #smbclient -L $SMB_HOST -U $SMB_USER
+    sudo mkdir -p /mnt/samba/$SMB_SHARE
+    sudo mount -t cifs //$SMB_HOST/$SMB_SHARE /mnt/samba/$SMB_SHARE -o username=$SMB_USER
+}
+
+mount_android() {
+    echo "null"
+}
+
+choice="$(printf "Mount: USB-Crypt\nUnmount: USB-Crypt\nMount: NFS\nUnmount: NFS" | dmenu -i -p "$ICON Mount Manager")" || exit 1
+case $choice in
+'Mount: USB-Crypt') mount_usb_crypt ;;
+'Unmount: USB-Crypt') unmount_usb_crypt ;;
+'Mount: NFS') mount_nfs ;;
+'Unmount: NFS') unmount_nfs ;;
+esac

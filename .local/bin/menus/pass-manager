@@ -1,0 +1,29 @@
+#!/bin/sh
+ICON=" "
+
+choice="$(printf "List\nNew Password\nGenerate Password\nOptions" | dmenu -i -p "$ICON Password Manager")" || exit 1
+
+if [ "$choice" = "List" ]; then
+    passmenu -i -p " "
+fi
+
+if [ "$choice" = "New Password" ]; then
+    pass_name="$(dmenu -i -p "$ICON Password Name:" -mesg "domain.de/user@example.de")" || exit 1
+    pass_import="$(dmenu -i -p "$ICON Password:")" || exit 1
+    echo "$pass_import" | pass insert -e "$pass_name"
+    notify-send "Password for $pass_name imported"
+fi
+
+if [ "$choice" = "Generate Password" ]; then
+    pass_name="$(dmenu -i -p "$ICON Password Name:" -mesg "domain.de/user@example.de")" || exit 1
+    pass_count="$(echo 32 | dmenu -i -p "$ICON Password Length:")" || exit 1
+    pass generate --no-symbols --clip "$pass_name" "$pass_count"
+    notify-send "Password for $pass_name created & copied to clipboard!"
+fi
+
+if [ "$choice" = "Options" ]; then
+    choice="$(printf "Open Directory\nImport Backup\nCreate Backup" | dmenu -i -p "$ICON Options")" || exit 1
+    if [ "$choice" = "Open Directory" ]; then
+        xdg-open "$HOME/.local/share/password-store"
+    fi
+fi

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+STATE_FILE="$HOME/.cache/monitor.scale"
+
+main() {
+
+    if [ "$1" = '' ]; then
+        set_dpi_state
+        exit
+    fi
+
+    if [ "$1" = '--revert' ]; then
+        set_dpi_revert
+        exit
+    fi
+
+    set_dpi "$1"
+}
+
+set_dpi_revert() {
+    scale=$(<"$STATE_FILE.bak")
+    set_dpi "$scale"
+}
+
+set_dpi_state() {
+    scale=$(<"$STATE_FILE")
+    set_dpi "$scale"
+}
+
+set_dpi() {
+    scale="$1"
+    xrandr --output "$ECOS_MONITOR" --scale "$scale"'x'"$scale"
+    if [ -f "$STATE_FILE" ]; then
+        cp "$STATE_FILE" "$STATE_FILE.bak"
+    fi
+    echo "$scale" >"$STATE_FILE"
+    set-wallpaper
+}
+
+main "$@"

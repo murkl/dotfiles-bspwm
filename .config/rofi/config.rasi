@@ -1,0 +1,15 @@
+configuration {
+	theme:				"nord.rasi";
+	font:				"Fira Code 10";
+	combi-modi:			"window,drun";
+	width:				24;
+	eh:					1;
+	bw:					3;
+	lines:				10;
+	sidebar-mode:		false;
+	location:			1;
+    yoffset:            44;
+    xoffset:            8;
+	show-icons:			false;
+	separator-style:	"none";
+}

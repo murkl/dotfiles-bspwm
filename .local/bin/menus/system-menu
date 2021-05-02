@@ -1,0 +1,168 @@
+#!/bin/sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+HELP_FILE="$SCRIPT_DIR/help.html"
+GUI_FONT="monospace"
+GUI_COLOR="#A3BE8C"
+gui_sizeGUI_SIZE="10"
+
+# CHECK CORE
+if ! [ -f "$ECOS_CORE" ]; then
+    error_txt='ERROR: ECOS Core not found'
+    echo "$error_txt"
+    notify-send "$error_txt"
+    exit 1
+fi
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# MAIN
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+main() {
+
+    if [ "$1" = "--power" ]; then
+        show_power_menu
+    fi
+
+    if [ "$1" = "" ]; then
+        show_main_menu
+    fi
+}
+
+zenity_menu() {
+    menu_text="$1" && shift
+    cancel_button_text="$1" && shift
+    ok_button_text="$1" && shift
+    title=$(echo "Power Menu" | awk '{print toupper($0)}')
+    text_styled='<span font_family="'$GUI_FONT'" font="'$gui_sizeGUI_SIZE'" foreground="'$GUI_COLOR'"><b>'$title'</b></span>'
+    zenity --list --ok-label="$ok_button_text" --cancel-label="$cancel_button_text" --text="\n$text_styled\n" --hide-header --column="" "$@"
+}
+
+show_main_menu() {
+    user_txt=$(echo "$USER" | awk '{$1=toupper(substr($1,0,1))substr($1,2)}1')
+    dmenu_entries="  $user_txt\n漣  Settings\n痢  Update\n襤  Power"
+    rofi_args="-location 3 -xoffset -8 -width 16 -lines 4"
+    dmenu_result="$(printf "$dmenu_entries" | dmenu -i $rofi_args -p ": ")" || exit 1
+
+    if [[ "$dmenu_result" == *"$user_txt" ]]; then
+        show_info_menu
+    fi
+
+    if [[ "$dmenu_result" == *"Settings" ]]; then
+        show_settings_menu
+    fi
+
+    if [[ "$dmenu_result" == *"Update" ]]; then
+        exec_system_update
+    fi
+
+    if [[ "$dmenu_result" == *"Power" ]]; then
+        show_power_menu
+    fi
+
+}
+
+show_power_menu() {
+
+    item_01="Refresh X11"
+    item_02="Restart X11"
+    item_03="Reboot"
+    item_04="Shutdown"
+    result=$(zenity_menu "" "Cancel" "Ok" "$item_01" "$item_02" "$item_03" "$item_04")
+    if [ $? = 1 ]; then
+        exit 0
+    fi
+    if [ "$result" = "$item_01" ]; then
+        bspc wm -r
+        return
+    fi
+    if [ "$result" = "$item_02" ]; then
+        bspc quit
+        return
+    fi
+    if [ "$result" = "$item_03" ]; then
+        reboot
+        return
+    fi
+    if [ "$result" = "$item_04" ]; then
+        poweroff
+        return
+    fi
+}
+
+show_settings_menu() {
+    rofi_args="-location 3 -xoffset -8 -width 16 -lines 6"
+    choice="$(printf "  Configuration\n留  Edit Favorits\n  Edit Dashboards\n  Screen Settings\n  Network Settings\n蓼  Audio Settings" | dmenu -i $rofi_args -p " ")" || exit 1
+
+    if [[ "$choice" = *"Configuration" ]]; then
+        $ECOS_CORE --set-env
+        if z_res=$(zenity --width="600" --height="400" --text-info --title="Configuration" --ok-label="Save" --cancel-label="Cancel" --font="monospace" --editable --filename="$ECOS_CONFIG_FILE"); then
+            echo "$z_res" >"$ECOS_CONFIG_FILE"
+            notify-send "Configuration saved"
+        fi
+    fi
+
+    if [[ "$choice" = *"Edit Dashboards" ]]; then
+        if z_res=$(zenity --width="600" --height="400" --text-info --title="Edit Dashboards" --ok-label="Save" --cancel-label="Cancel" --font="monospace" --editable --filename="$ECOS_CONFIG_HOME/dashboards.sh"); then
+            echo "$z_res" >"$ECOS_CONFIG_HOME/dashboards.sh"
+            notify-send "Dashboards saved"
+        fi
+    fi
+
+    if [[ "$choice" = *"Edit Favorits" ]]; then
+        if z_res=$(zenity --width="600" --height="400" --text-info --title="Edit Favorits" --ok-label="Save" --cancel-label="Cancel" --font="monospace" --editable --filename="$ECOS_CONFIG_HOME/favorits.sh"); then
+            echo "$z_res" >"$ECOS_CONFIG_HOME/favorits.sh"
+            notify-send "Favorits saved"
+        fi
+    fi
+
+    if [[ "$choice" = *"Audio Settings" ]]; then
+        $TERMINAL -e pulsemixer
+    fi
+
+    if [[ "$choice" = *"Network Settings" ]]; then
+        $TERMINAL -e nmtui
+    fi
+
+    if [[ "$choice" = *"Screen Settings" ]]; then
+        if ! [ -x "$(command -v arandr)" ]; then
+            echo "ERROR: arandr not installed"
+            exit 1
+        fi
+        arandr
+    fi
+}
+
+#/////////////////////////////////////////////
+
+show_info_menu() {
+    rofi_args="-location 3 -xoffset -8 -width 16 -lines 3"
+    choice="$(printf "  System Monitor\n  System Information\n  Help" | dmenu -i $rofi_args -p " ")" || exit 1
+
+    if [[ "$choice" == *"System Monitor" ]]; then
+        $TERMINAL -e sh -c 'gotop'
+    fi
+
+    if [[ "$choice" == *"System Information" ]]; then
+        $TERMINAL -e sh -c 'neofetch && echo "Press <ENTER> to close Window..." && read'
+    fi
+
+    if [[ "$choice" = *"Help" ]]; then
+        zenity --text-info --width=500 --height=500 --title="Help" --ok-label="Website" --cancel-label="Close" --html --no-interaction --filename="$HELP_FILE"
+        if [ "$?" = "0" ]; then
+            xdg-open "http://ecos.webhop.me"
+        fi
+    fi
+
+}
+
+#/////////////////////////////////////////////
+
+exec_system_update() {
+    $ECOS_TERMINAL -e sh -c "update-system"
+}
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# BOOT
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+main "$@"

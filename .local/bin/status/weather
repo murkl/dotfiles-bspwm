@@ -1,0 +1,5 @@
+#!/bin/bash
+# https://github.com/chubin/wttr.in
+
+TEMPERATURE=$(curl -s 'wttr.in/'$ECOS_WEATHER_LOCATION'?format=%t\n')
+echo "$TEMPERATURE" | sed 's/+//'

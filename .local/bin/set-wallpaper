@@ -1,0 +1,4 @@
+#!/bin/sh
+wallpaper_path="${XDG_DATA_HOME}/wallpaper"
+[ -f "$1" ] && cp "$(readlink -f "$1")" "$wallpaper_path" && notify-send -i "$wallpaper_path" "Changing Wallpaper..."
+xwallpaper --zoom "$wallpaper_path"

@@ -1,0 +1,62 @@
+#!/bin/sh
+ICON=" "
+SCREENSHOT="$ECOS_SCREENSHOTS/Screenshot-%Y-%m-%d-%H-%M-%S.png"
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# DEPENDENCIES
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+if ! [ -x "$(command -v scrot)" ]; then
+    notify-send "ERROR: scrot not installed"
+    exit 1
+fi
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# MAIN
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+main() {
+
+    mkdir -p "$ECOS_SCREENSHOTS"
+
+    if [ "$1" == "-f" ]; then
+        capture_full
+        exit
+    fi
+
+    if [ "$1" == "-w" ]; then
+        capture_window
+        exit
+    fi
+
+    if [ "$1" == "" ]; then
+        result="$(printf "Capture Fullscreen\nCapture Window" | dmenu -i -p "$ICON Screenshot:")" || exit 1
+        delay="$(printf "0\n3\n5" | dmenu -i -p "$ICON Delay in Seconds:")" || exit 1
+        if [ "$delay" != "0" ]; then
+            notify-send -t 2000 "$result in $delay Seconds..."
+            sleep "$delay"
+        fi
+        case $result in
+        'Capture Fullscreen') capture_full ;;
+        'Capture Window') capture_window ;;
+        esac
+    fi
+}
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# FUNCTIONS
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+capture_full() {
+    scrot -e 'mv $f '"$SCREENSHOT" && notify-send "Fullscreen Screenshot created"
+}
+
+capture_window() {
+    scrot -u -e 'mv $f '"$SCREENSHOT" && notify-send "Window Screenshot created"
+}
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# BOOT
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+main "$@"

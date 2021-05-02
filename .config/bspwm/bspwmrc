@@ -1,0 +1,58 @@
+#! /bin/sh
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# START POLYBAR
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+$HOME/.config/polybar/launch.sh &
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# COLORS
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+color_background=$(xrdb ~/.config/X11/xresources -query all | grep background | cut -f2)
+color_foreground=$(xrdb ~/.config/X11/xresources -query all | grep foreground | cut -f2)
+color_border=$(xrdb ~/.config/X11/xresources -query all | grep color2 | cut -f2)
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# CONFIGURATION
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+# Workspace
+bspc monitor -d 1 2 3 4 5
+
+bspc config focused_border_color "$color_border"
+bspc config normal_border_color "$color_background"
+
+bspc config border_width 0
+bspc config window_gap 8
+bspc config top_padding 36
+bspc config split_ratio 0.50
+
+bspc config borderless_monocle true
+bspc config gapless_monocle false
+bspc config single_monocle true
+bspc config focus_follows_pointer false
+
+# Mouse
+bspc config swallow_first_click true
+
+# Monitors
+bspc config remove_disabled_monitors true
+bspc config remove_unplugged_monitors true
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+# RULES
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+# xprop WM_CLASS
+
+bspc rule -a "Zenity" state=floating
+bspc rule -a "Sxiv" desktop=^3 follow=on
+bspc rule -a "mpv" desktop=^3 follow=on
+bspc rule -a "Tor Browser" state=floating
+
+bspc rule -a "$ECOS_TERMINAL_CLASS" desktop=^5 follow=on
+bspc rule -a "$ECOS_BROWSER_CLASS" desktop=^1 follow=on
+bspc rule -a "$ECOS_FILES_CLASS" desktop=^2 follow=on
+bspc rule -a "$ECOS_EDITOR_CLASS" desktop=^3 follow=on
+bspc rule -a "$ECOS_EMAIL_CLASS" desktop=^4 follow=on

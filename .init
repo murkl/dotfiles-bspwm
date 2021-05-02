@@ -1,0 +1,188 @@
+#!/bin/sh
+
+# This script will install all dependencies for this dotfiles repository
+# and will automatically call by the ecos installation routine
+
+# ///////////////////////////////////////////
+# Helper
+# ///////////////////////////////////////////
+
+print_title() {
+    echo -e "\n"
+    echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo -e "> $1"
+    echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+}
+
+# ///////////////////////////////////////////
+# Install packages
+# ///////////////////////////////////////////
+
+packages=""
+
+# Bspwm & dependencies
+packages="$packages xorg-server xorg-xinit"     # Graphical Server
+packages="$packages pulseaudio-alsa"            # Audio
+packages="$packages bspwm sxhkd"                # Window manager & Shortcut manager
+packages="$packages polybar"                    # Status bar
+packages="$packages dunst libnotify"            # Notification
+packages="$packages rofi"                       # App launcher
+packages="$packages picom"                      # Window commpositor
+packages="$packages redshift"                   # Night mode
+packages="$packages unclutter"                  # Hide mouse pointer
+packages="$packages kitty"                      # Terminal emulator
+packages="$packages neovim neovim-plug"         # Editor
+packages="$packages ranger ueberzug"            # File manager
+packages="$packages sxiv"                       # Image viewer
+packages="$packages xwallpaper"                 # Wallpaper
+packages="$packages scrot"                      # Screenshot tool
+packages="$packages pass"                       # Password manager
+packages="$packages zathura zathura-pdf-mupdf"  # PDF viewer
+packages="$packages mpd mpc ncmpcpp"            # Music player
+packages="$packages mpv"                        # Video player
+packages="$packages gotop-bin neofetch"         # Monitoring
+packages="$packages qutebrowser python-adblock" # Browser
+packages="$packages atool zip unzip unrar"      # Archive manager
+packages="$packages geary"                      # E-Mail
+
+# Miscellaneous
+packages="$packages gnome-keyring"
+packages="$packages xdg-user-dirs"
+packages="$packages zsh-autosuggestions zsh-syntax-highlighting"
+packages="$packages xorg-xsetroot xorg-xset xorg-xkill"
+packages="$packages wmctrl xclip xdotool"
+packages="$packages pacman-contrib"
+packages="$packages man-db"
+packages="$packages simple-mtpfs fuseiso"
+packages="$packages pulsemixer"
+packages="$packages openssh sshpass"
+packages="$packages wget youtube-dl rsync"
+packages="$packages zenity jq bc"
+packages="$packages nfs-utils samba"
+packages="$packages ttf-dejavu ttf-liberation"
+packages="$packages hunspell hunspell-en_us hunspell-de"
+
+# VSCodium
+packages="$packages vscodium-bin vscodium-bin-marketplace"
+
+# Nemo
+packages="$packages nemo nemo-fileroller nemo-image-converter"
+packages="$packages gvfs gvfs-smb gvfs-mtp"
+packages="$packages gnome-disk-utility"
+
+# Install packages
+print_title "INSTALL PACKAGES"
+paru --noconfirm --needed --sudoloop -Syyu $packages
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# Gnome keyring with PAM
+# ///////////////////////////////////////////
+
+print_title "CONFIGURE PAM"
+
+{
+    echo "#%PAM-1.0"
+    echo ""
+    echo "auth       required     pam_securetty.so"
+    echo "auth       requisite    pam_nologin.so"
+    echo "auth       include      system-local-login"
+    echo "auth       optional     pam_gnome_keyring.so"
+    echo "account    include      system-local-login"
+    echo "session    include      system-local-login"
+    echo "session    optional     pam_gnome_keyring.so auto_start"
+} >"/tmp/pam-login"
+
+sudo cp "/tmp/pam-login" "/etc/pam.d/login"
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# XDG
+# ///////////////////////////////////////////
+
+print_title "CONFIGURE XDG"
+
+# Disable auto run of XDG to use user-dir.dirs instead
+sudo sed -i 's/enabled=True/enabled=False/g' /etc/xdg/user-dirs.conf
+# Update dirs
+
+xdg-user-dirs-update --force
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# Configure Samba
+# ///////////////////////////////////////////
+
+print_title "CONFIGURE SAMBA"
+
+if [ ! -f "/etc/samba/smb.conf" ]; then
+    {
+        echo "[global]"
+        echo "   workgroup = WORKGROUP"
+        echo "   log file = /var/log/samba/%m"
+    } >"/tmp/smb.conf"
+    sudo mv "/tmp/smb.conf" "/etc/samba/smb.conf"
+fi
+
+sudo systemctl enable smb.service
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# Nemo Open Terminal (F4)
+# ///////////////////////////////////////////
+
+print_title "NEMO TERMINAL SHORTCUT"
+
+mkdir -p "$HOME/.gnome2/accels/"
+echo '(gtk_accel_path "<Actions>/DirViewActions/OpenInTerminal" "F4")' >"$HOME/.gnome2/accels/nemo"
+
+# Cinnamon
+gsettings set org.cinnamon.desktop.default-applications.terminal exec kitty
+gsettings set org.cinnamon.desktop.interface can-change-accels true
+
+# GNOME
+gsettings set org.gnome.desktop.default-applications.terminal exec kitty
+gsettings set org.gnome.desktop.interface can-change-accels true
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# Remove orphans
+# ///////////////////////////////////////////
+
+print_title "REMOVE ORPHANS"
+
+sudo pacman --noconfirm -Rs $(pacman -Qtdq)
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# Create symlinks
+# ///////////////////////////////////////////
+print_title "CREATE SYM LINKS"
+
+sudo ln -sf /usr/bin/rofi /usr/bin/dmenu
+sudo ln -sf /usr/bin/nvim /usr/bin/vim
+
+echo -e "DONE"
+
+# ///////////////////////////////////////////
+# Create default dirs
+# ///////////////////////////////////////////
+
+print_title "CREATE DIRS"
+
+mkdir -p "$HOME/Desktop"
+mkdir -p "$HOME/Documents"
+mkdir -p "$HOME/Downloads"
+mkdir -p "$HOME/Music"
+mkdir -p "$HOME/Pictures"
+mkdir -p "$HOME/Projects"
+mkdir -p "$HOME/Templates"
+mkdir -p "$HOME/Videos"
+
+echo -e "DONE"
