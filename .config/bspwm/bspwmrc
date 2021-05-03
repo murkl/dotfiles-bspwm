@@ -49,6 +49,7 @@ bspc config remove_unplugged_monitors true
 bspc rule -a "Zenity" state=floating
 bspc rule -a "Sxiv" desktop=^3 follow=on
 bspc rule -a "mpv" desktop=^3 follow=on
+bspc rule -a "Gimp-2.10" desktop=^3 follow=on
 bspc rule -a "Tor Browser" state=floating
 
 bspc rule -a "$ECOS_TERMINAL_CLASS" desktop=^5 follow=on
