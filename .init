@@ -61,6 +61,7 @@ packages="$packages zenity jq bc"
 packages="$packages nfs-utils samba"
 packages="$packages ttf-dejavu ttf-liberation"
 packages="$packages hunspell hunspell-en_us hunspell-de"
+packages="$packages galculator"
 
 # VSCodium
 packages="$packages vscodium-bin vscodium-bin-marketplace"
