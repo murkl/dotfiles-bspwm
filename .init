@@ -10,7 +10,7 @@ ECOS_CONFIG_FILE="$ECOS_CONFIG_HOME/config"
 # MAIN
 # ///////////////////////////////////////////
 
-init() {
+install() {
 
     # ///////////////////////////////////////////
     # Install packages
@@ -289,5 +289,17 @@ fi
 ##################################################
 # START INIT
 ##################################################
-echo "STARTING INIT SCRIPT..."
-init "$@"
+
+if [ "$1" = "--install" ]; then
+    echo "INSTALLING INIT SCRIPT..."
+    install "$@"
+    exit $?
+fi
+
+##################################################
+# HELP
+##################################################
+echo "USE WITH PARAMETERS"
+echo "--install"
+echo "--update"
+echo "--remove"
