@@ -2,9 +2,12 @@
 
 # This script will install all dependencies for this dotfiles repository
 # and will automatically call by the ecos installation routine
+SCRIPT_ID="ecos"
+ECOS_CONFIG_HOME="$HOME/.config/ecos"
+ECOS_CONFIG_FILE="$ECOS_CONFIG_HOME/config"
 
 # ///////////////////////////////////////////
-# Helper
+# HELPER
 # ///////////////////////////////////////////
 
 print_title() {
@@ -12,6 +15,15 @@ print_title() {
     echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     echo -e "> $1"
     echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+}
+
+check_env() {
+    local config_key="$1"
+    local config_value="$2"
+    touch "$ECOS_CONFIG_FILE"
+    if ! grep -qrnw "$ECOS_CONFIG_FILE" -e "$config_key=*"; then
+        echo "export $config_key=\"$config_value\"" >>"$ECOS_CONFIG_FILE"
+    fi
 }
 
 # ///////////////////////////////////////////
@@ -186,4 +198,54 @@ mkdir -p "$HOME/Projects"
 mkdir -p "$HOME/Templates"
 mkdir -p "$HOME/Videos"
 
+# ///////////////////////////////////////////
+# CHECK ENV
+# ///////////////////////////////////////////
+
+# Create config dir and file
+mkdir -p "$ECOS_CONFIG_HOME"
+touch "$ECOS_CONFIG_FILE"
+
+# Check values
+check_env "ECOS_CORE" '$HOME/.local/bin/'$SCRIPT_ID''
+check_env "ECOS_CONFIG_HOME" '$HOME/.config/ecos'
+check_env "ECOS_CONFIG_FILE" '$ECOS_CONFIG_HOME/config'
+
+check_env "ECOS_MONITOR" 'HDMI-2'
+check_env "ECOS_WIRELESS_INTERFACE" 'wlp8s0'
+check_env "ECOS_BATTERY_INTERFACE" 'BAT1'
+check_env "ECOS_BATTERY_ADAPTER" 'ACAD'
+
+check_env "ECOS_BACKUP_SOURCE" '$HOME'
+check_env "ECOS_BACKUP_DESTINATION" '/mnt/crypt-usb/$USER'
+check_env "ECOS_BACKUP_SSH_HOST" ''
+check_env "ECOS_BACKUP_SSH_USER" ''
+check_env "ECOS_BACKUP_SSH_PASS" ''
+
+check_env "ECOS_POSTEO_SERVER" 'posteo.de:993'
+check_env "ECOS_POSTEO_EMAIL" 'user@posteo.de'
+check_env "ECOS_POSTEO_PASSWORD" ''
+check_env "ECOS_WEATHER_LOCATION" 'Kassel'
+
+check_env "ECOS_DOWNLOAD_MUSIC" '$HOME/Downloads/Music'
+check_env "ECOS_DOWNLOAD_VIDEOS" '$HOME/Downloads/Videos'
+check_env "ECOS_DOWNLOAD_MOVIES" '$HOME/Downloads/Movies'
+
+check_env "ECOS_SCREENSHOTS" '$HOME/Desktop/Screenshots'
+
+# ECOS DEFAULT APPS
+check_env "ECOS_TERMINAL" 'kitty'
+check_env "ECOS_TERMINAL_CLASS" 'kitty'
+check_env "ECOS_EDITOR" 'vscodium'
+check_env "ECOS_EDITOR_CLASS" 'VSCodium'
+check_env "ECOS_FILES" 'nemo'
+check_env "ECOS_FILES_CLASS" 'Nemo'
+check_env "ECOS_BROWSER" 'qutebrowser'
+check_env "ECOS_BROWSER_CLASS" 'qutebrowser'
+check_env "ECOS_EMAIL" 'geary'
+check_env "ECOS_EMAIL_CLASS" 'Geary'
+check_env "ECOS_MUSIC" 'kitty -e ncmpcpp'
+check_env "ECOS_MUSIC_CLASS" ''
+
+# Load config file
 echo -e "DONE"
