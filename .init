@@ -12,38 +12,6 @@ ECOS_CONFIG_FILE="$ECOS_CONFIG_HOME/config"
 
 init() {
 
-}
-
-update() {
-    echo "nothing"
-}
-
-remove() {
-    echo "nothing"
-}
-
-# ///////////////////////////////////////////
-# HELPER
-# ///////////////////////////////////////////
-
-print_title() {
-    echo -e "\n"
-    echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    echo -e "> $1"
-    echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-}
-
-check_env() {
-    local config_key="$1"
-    local config_value="$2"
-    touch "$ECOS_CONFIG_FILE"
-    if ! grep -qrnw "$ECOS_CONFIG_FILE" -e "$config_key=*"; then
-        echo "export $config_key=\"$config_value\"" >>"$ECOS_CONFIG_FILE"
-    fi
-}
-
-init() {
-
     # ///////////////////////////////////////////
     # Install packages
     # ///////////////////////////////////////////
@@ -268,6 +236,34 @@ init() {
     # Load config file
     echo -e "DONE"
 
+}
+
+update() {
+    echo "nothing"
+}
+
+remove() {
+    echo "nothing"
+}
+
+# ///////////////////////////////////////////
+# HELPER
+# ///////////////////////////////////////////
+
+print_title() {
+    echo -e "\n"
+    echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo -e "> $1"
+    echo -e ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+}
+
+check_env() {
+    local config_key="$1"
+    local config_value="$2"
+    touch "$ECOS_CONFIG_FILE"
+    if ! grep -qrnw "$ECOS_CONFIG_FILE" -e "$config_key=*"; then
+        echo "export $config_key=\"$config_value\"" >>"$ECOS_CONFIG_FILE"
+    fi
 }
 
 ##################################################
