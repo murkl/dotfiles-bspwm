@@ -98,6 +98,16 @@ install() {
     echo -e "DONE"
 
     # ///////////////////////////////////////////
+    # GnuPG
+    # ///////////////////////////////////////////
+
+    mkdir -p "$HOME/.local/share/gnupg"
+    echo 'pinentry-program /usr/bin/pinentry-gnome3' >"$HOME/.local/share/gnupg/gpg-agent.conf"
+    # Set correct gnupg permission
+    chmod -R go-rwx "$HOME/.local/share/gnupg"
+    echo -e "DONE"
+
+    # ///////////////////////////////////////////
     # XDG
     # ///////////////////////////////////////////
 
