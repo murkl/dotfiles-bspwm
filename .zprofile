@@ -8,13 +8,13 @@ export ECOS_HOME="$HOME/.ecos"
 #################################################
 
 export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$ECOS_HOME/ecos"
+export PATH="$PATH:$ECOS_HOME/bin"
 
 #################################################
 # SOURCE ECOS ENV
 #################################################
 
-source $ECOS_HOME/ecos.conf
+source $ECOS_HOME/config/ecos.conf
 
 #################################################
 # EXPORT ENV VARS

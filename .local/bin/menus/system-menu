@@ -94,7 +94,6 @@ show_settings_menu() {
     choice="$(printf "  Configuration\n留  Edit Favorits\n  Edit Dashboards\n  Screen Settings\n  Network Settings\n蓼  Audio Settings" | dmenu -i $rofi_args -p " ")" || exit 1
 
     if [[ "$choice" = *"Configuration" ]]; then
-        $ECOS_CORE --set-env
         if z_res=$(zenity --width="600" --height="400" --text-info --title="Configuration" --ok-label="Save" --cancel-label="Cancel" --font="monospace" --editable --filename="$ECOS_CONFIG_FILE"); then
             echo "$z_res" >"$ECOS_CONFIG_FILE"
             notify-send "Configuration saved"

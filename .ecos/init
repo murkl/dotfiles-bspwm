@@ -2,9 +2,9 @@
 
 # This script will install all dependencies for this dotfiles repository
 # and will automatically call by the ecos installation routine
-SCRIPT_ID="ecos"
-ECOS_CONFIG_HOME="$HOME/.config/ecos"
-ECOS_CONFIG_FILE="$ECOS_CONFIG_HOME/config"
+
+ECOS_CONFIG_HOME="$HOME/.ecos/config"
+ECOS_CONFIG_FILE="$ECOS_CONFIG_HOME/ecos.conf"
 
 # ///////////////////////////////////////////
 # MAIN
@@ -203,9 +203,9 @@ install() {
     touch "$ECOS_CONFIG_FILE"
 
     # Check values
-    check_env "ECOS_CORE" '$HOME/.local/bin/'$SCRIPT_ID''
-    check_env "ECOS_CONFIG_HOME" '$HOME/.config/ecos'
-    check_env "ECOS_CONFIG_FILE" '$ECOS_CONFIG_HOME/config'
+    check_env "ECOS_CORE" '$HOME/.ecos/bin/ecos'
+    check_env "ECOS_CONFIG_HOME" '$HOME/.ecos/config'
+    check_env "ECOS_CONFIG_FILE" '$ECOS_CONFIG_HOME/ecos.conf'
 
     check_env "ECOS_MONITOR" 'HDMI-2'
     check_env "ECOS_WIRELESS_INTERFACE" 'wlp8s0'
