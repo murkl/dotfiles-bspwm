@@ -45,6 +45,9 @@ setxkbmap de
 # Set DPI
 set-dpi
 
+# ECOS Autostart
+(sleep 5 && $ECOS_CORE --autostart) &
+
 # /////////////////////////////////////////////
 # Start window manager
 # /////////////////////////////////////////////

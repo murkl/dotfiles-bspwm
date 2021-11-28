@@ -2,6 +2,7 @@
 
 # ECOS
 export ECOS_HOME="$HOME/.ecos"
+export ECOS_CORE="$ECOS_HOME/bin/ecos"
 
 #################################################
 # PATH
