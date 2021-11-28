@@ -1,5 +1,6 @@
 configuration {
-	theme:				"nord.rasi";
+	// FIX ME
+	//theme:				"nord.rasi";
 	font:				"Fira Code 10";
 	combi-modi:			"window,drun";
 	width:				24;
