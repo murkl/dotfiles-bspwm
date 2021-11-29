@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# ECOS
+source "$HOME/.ecos/profile"
+
 # Load xresources (colors)
 [[ -f $XDG_CONFIG_HOME/X11/xresources ]] && xrdb -merge $XDG_CONFIG_HOME/X11/xresources
 
@@ -44,9 +47,6 @@ setxkbmap de
 
 # Set DPI
 set-dpi
-
-# ECOS Autostart
-(sleep 5 && $ECOS_CORE --autostart) &
 
 # /////////////////////////////////////////////
 # Start window manager

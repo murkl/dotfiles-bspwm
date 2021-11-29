@@ -1,21 +1,10 @@
 #!/bin/sh
 
-# ECOS
-export ECOS_HOME="$HOME/.ecos"
-export ECOS_CORE="$ECOS_HOME/bin/ecos"
-
 #################################################
 # PATH
 #################################################
 
 export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$ECOS_HOME/bin"
-
-#################################################
-# SOURCE ECOS ENV
-#################################################
-
-source $ECOS_HOME/config/ecos.conf
 
 #################################################
 # EXPORT ENV VARS
